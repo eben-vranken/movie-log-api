@@ -25,6 +25,35 @@ func (mr MovieRepository) Create(ctx context.Context, movie models.Movie) (model
 	return movie, err
 }
 
+func (mr MovieRepository) GetAll(ctx context.Context) ([]models.Movie, error) {
+	rows, err := mr.db.QueryContext(ctx, "SELECT id, title, genre_id, director, release_date, runtime, rating FROM movies")
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var movies []models.Movie
+
+	for rows.Next() {
+		var movie models.Movie
+		err := rows.Scan(&movie.ID, &movie.Title, &movie.GenreID, &movie.Director, &movie.ReleaseDate, &movie.Runtime, &movie.Rating)
+
+		if err != nil {
+			return nil, err
+		}
+
+		movies = append(movies, movie)
+	}
+
+	if rows.Err() != nil {
+		return nil, rows.Err()
+	}
+
+	return movies, rows.Err()
+}
+
 func CreateNewMovieRepository(db *sql.DB) MovieRepository {
 	t := new(MovieRepository)
 	t.db = db

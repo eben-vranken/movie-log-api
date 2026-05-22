@@ -45,6 +45,26 @@ func (mh *MovieHandler) Create(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
+func (mh *MovieHandler) GetAll(w http.ResponseWriter, req *http.Request) {
+	movies, err := mh.mr.GetAll(req.Context())
+
+	if err != nil {
+		log.Print(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("500 - Internal server error"))
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(movies)
+
+	if err != nil {
+		log.Print(err)
+		log.Print("500 - Internal server error")
+	}
+}
+
 func CreateNewMovieHandler(mr repository.MovieRepository) MovieHandler {
 	t := new(MovieHandler)
 	t.mr = &mr
