@@ -1,0 +1,20 @@
+-- +goose Up
+INSERT INTO genres (name) VALUES 
+    ('Action'),
+    ('Adventure'),
+    ('Animation'),
+    ('Comedy'),
+    ('Crime'),
+    ('Documentary'),
+    ('Drama'),
+    ('Family'),
+    ('History'),
+    ('Horror'),
+    ('Music'),
+    ('Mystery'),
+    ('Romance'),
+    ('Science Fiction'),
+    ('TV Movie'),
+    ('Thriller'),
+    ('War'),
+    ('Western');
