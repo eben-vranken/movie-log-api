@@ -3,7 +3,12 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 	"time"
+
+	"github.com/eben-vranken/movie-log/internal/database"
+	"github.com/eben-vranken/movie-log/internal/handlers"
+	"github.com/eben-vranken/movie-log/internal/repository"
 )
 
 type statusRecorder struct {
@@ -11,10 +16,22 @@ type statusRecorder struct {
 	statusCode int
 }
 
+var databaseURL = os.Getenv("DATABASE_URL")
+
 func main() {
 	http.HandleFunc("GET /health", loggingMiddleware(healthCheck))
 
+	db, err := database.New(databaseURL)
+
+	if err != nil {
+		log.Panicf("Error when opening database %v\n", err)
+	}
+
+	movieRepository := repository.CreateNewMovieRepository(db)
+	movieHandler := handlers.CreateNewMovieHandler(movieRepository)
+
 	// Movie routes
+	http.HandleFunc("POST /movies", loggingMiddleware(movieHandler.Create))
 
 	log.Print("Listening to port 8080...")
 	http.ListenAndServe("127.0.0.1:8080", nil)
